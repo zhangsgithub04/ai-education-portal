@@ -6,57 +6,106 @@ const modules = [
   {
     id: 1,
     title: "Introduction to AI in Education",
-    duration: "2 weeks",
-    topics: ["AI fundamentals", "Educational context", "Historical overview"],
+    duration: "Week 1",
+    topics: ["AI fundamentals", "Educational context", "Historical overview", "Benefits and challenges"],
     status: "available"
   },
   {
     id: 2,
-    title: "Machine Learning for Educators",
-    duration: "2 weeks",
-    topics: ["Supervised learning", "Unsupervised learning", "Deep learning basics"],
+    title: "Machine Learning Fundamentals I",
+    duration: "Week 2",
+    topics: ["Supervised learning", "Unsupervised learning", "Linear regression", "Model evaluation"],
     status: "available"
   },
   {
     id: 3,
-    title: "Natural Language Processing",
-    duration: "1.5 weeks",
-    topics: ["Text analysis", "Language models", "Educational applications"],
-    status: "coming-soon"
+    title: "Machine Learning Fundamentals II",
+    duration: "Week 3",
+    topics: ["Neural networks", "Deep learning", "Training validation", "Regularization"],
+    status: "available"
   },
   {
     id: 4,
-    title: "Personalized Learning Systems",
-    duration: "1.5 weeks",
-    topics: ["Adaptive algorithms", "Student modeling", "Content recommendation"],
+    title: "Natural Language Processing",
+    duration: "Week 4",
+    topics: ["Text analysis", "Sentiment analysis", "Essay scoring", "Language learning apps"],
     status: "coming-soon"
   },
   {
     id: 5,
-    title: "Automated Assessment",
-    duration: "2 weeks",
-    topics: ["Grading systems", "Plagiarism detection", "Performance analytics"],
+    title: "Computer Vision for Education",
+    duration: "Week 5",
+    topics: ["Image recognition", "Document analysis", "Visual materials", "Accessibility"],
     status: "coming-soon"
   },
   {
     id: 6,
-    title: "Intelligent Tutoring Systems",
-    duration: "1.5 weeks",
-    topics: ["Conversational AI", "Tutoring strategies", "Feedback mechanisms"],
+    title: "Personalized Learning Systems",
+    duration: "Week 6",
+    topics: ["Adaptive algorithms", "Student modeling", "Recommendation systems", "Learning paths"],
     status: "coming-soon"
   },
   {
     id: 7,
-    title: "Ethics and AI in Education",
-    duration: "1 week",
-    topics: ["Bias detection", "Privacy concerns", "Fairness in AI"],
+    title: "Intelligent Tutoring Systems",
+    duration: "Week 7",
+    topics: ["ITS architecture", "Knowledge representation", "Assessment methods", "Feedback"],
     status: "coming-soon"
   },
   {
     id: 8,
-    title: "Future of Educational Technology",
-    duration: "1.5 weeks",
-    topics: ["Emerging trends", "Implementation strategies", "Case studies"],
+    title: "Learning Analytics & Data Mining",
+    duration: "Week 8",
+    topics: ["Data mining", "Analytics frameworks", "Predictive modeling", "Dashboards"],
+    status: "coming-soon"
+  },
+  {
+    id: 9,
+    title: "Assessment and Evaluation",
+    duration: "Week 9",
+    topics: ["Automated assessment", "Computer testing", "Performance prediction", "Bias detection"],
+    status: "coming-soon"
+  },
+  {
+    id: 10,
+    title: "Ethical AI in Education",
+    duration: "Week 10",
+    topics: ["Privacy protection", "Algorithmic fairness", "Transparency", "Ethical frameworks"],
+    status: "coming-soon"
+  },
+  {
+    id: 11,
+    title: "Implementation and Integration",
+    duration: "Week 11",
+    topics: ["System architecture", "Technology stacks", "Platform integration", "Scalability"],
+    status: "coming-soon"
+  },
+  {
+    id: 12,
+    title: "AI-Powered Learning Platforms",
+    duration: "Week 12",
+    topics: ["LMS integration", "Chatbots", "Gamification", "Mobile learning"],
+    status: "coming-soon"
+  },
+  {
+    id: 13,
+    title: "Future Trends & Emerging Tech",
+    duration: "Week 13",
+    topics: ["VR/AR in education", "Conversational AI", "Blockchain credentials", "Research opportunities"],
+    status: "coming-soon"
+  },
+  {
+    id: 14,
+    title: "Capstone Project Presentations",
+    duration: "Week 14",
+    topics: ["Project presentations", "Peer evaluations", "Case studies", "Course synthesis"],
+    status: "coming-soon"
+  },
+  {
+    id: 15,
+    title: "Final Exam & Course Wrap-up",
+    duration: "Week 15",
+    topics: ["Comprehensive exam", "Course evaluation", "Professional development", "Certification"],
     status: "coming-soon"
   }
 ]
@@ -74,7 +123,7 @@ export default function Modules() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {modules.map((module) => (
             <Card key={module.id} className="hover:shadow-lg transition-shadow">
               <CardHeader className="pb-4">

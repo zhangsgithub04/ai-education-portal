@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button"
+import Link from "next/link"
 
 export function HeroSection() {
   return (
@@ -16,12 +17,16 @@ export function HeroSection() {
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg">
-            Start Learning
-          </Button>
-          <Button variant="outline" className="px-8 py-3 text-lg">
-            View Syllabus
-          </Button>
+          <Link href="/modules">
+            <Button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg">
+              Start Learning
+            </Button>
+          </Link>
+          <Link href="/syllabus">
+            <Button variant="outline" className="px-8 py-3 text-lg">
+              View Syllabus
+            </Button>
+          </Link>
         </div>
       </div>
     </div>

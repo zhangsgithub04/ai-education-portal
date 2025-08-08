@@ -1,3 +1,5 @@
+"use client"
+
 import { Navigation } from "@/components/navigation"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -36,19 +38,19 @@ const resourceCategories = [
         title: "TensorFlow for Educators",
         type: "Framework",
         author: "Google",
-        link: "#"
+        link: "https://www.tensorflow.org/resources/learn-ml"
       },
       {
         title: "Hugging Face Transformers",
         type: "Library",
         author: "Hugging Face",
-        link: "#"
+        link: "https://huggingface.co/docs/transformers"
       },
       {
         title: "OpenAI GPT API for Education",
         type: "API Service",
         author: "OpenAI",
-        link: "#"
+        link: "https://platform.openai.com/docs"
       }
     ]
   },
@@ -60,7 +62,7 @@ const resourceCategories = [
         title: "Student Performance Dataset",
         type: "Dataset",
         author: "UCI ML Repository",
-        link: "#"
+        link: "https://archive.ics.uci.edu/ml/datasets/student+performance"
       },
       {
         title: "Educational Text Corpus",
@@ -149,8 +151,10 @@ export default function Resources() {
                           variant="outline" 
                           size="sm" 
                           className="w-full text-xs"
+                          onClick={() => window.open(resource.link, '_blank')}
+                          disabled={resource.link === '#'}
                         >
-                          Access Resource
+                          {resource.link === '#' ? 'Coming Soon' : 'Access Resource'}
                         </Button>
                       </div>
                     </div>

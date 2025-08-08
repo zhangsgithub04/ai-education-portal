@@ -18,10 +18,10 @@ export function Navigation() {
           
           <div className="hidden md:flex items-center space-x-8">
             <Link href="/" className="text-gray-700 hover:text-blue-600 font-medium">Overview</Link>
-            <Link href="#" className="text-gray-700 hover:text-blue-600 font-medium">Syllabus</Link>
+            <Link href="/syllabus" className="text-gray-700 hover:text-blue-600 font-medium">Syllabus</Link>
             <Link href="/modules" className="text-gray-700 hover:text-blue-600 font-medium">Modules</Link>
             <Link href="/resources" className="text-gray-700 hover:text-blue-600 font-medium">Resources</Link>
-            <Link href="#" className="text-gray-700 hover:text-blue-600 font-medium">Blog</Link>
+            <Link href="/blog" className="text-gray-700 hover:text-blue-600 font-medium">Blog</Link>
           </div>
 
           <div className="flex items-center space-x-3">
