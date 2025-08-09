@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation"
 import { Navigation } from "@/components/navigation"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import dynamic from "next/dynamic"
 
 const MDEditor = dynamic(
@@ -137,7 +136,6 @@ export default function NewBlog() {
                     height={400}
                     preview="edit"
                     hideToolbar={false}
-                    visibleDragBar={false}
                   />
                 </div>
                 <p className="text-sm text-gray-500 mt-1">

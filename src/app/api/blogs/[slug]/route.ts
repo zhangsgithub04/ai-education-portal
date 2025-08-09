@@ -4,12 +4,13 @@ import Blog from '@/models/Blog'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  context: { params: Promise<{ slug: string }> }
 ) {
   try {
     await dbConnect()
+    const { slug } = await context.params
     
-    const blog = await Blog.findOne({ slug: params.slug, published: true })
+    const blog = await Blog.findOne({ slug, published: true })
     
     if (!blog) {
       return NextResponse.json(
@@ -29,16 +30,17 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  context: { params: Promise<{ slug: string }> }
 ) {
   try {
     await dbConnect()
+    const { slug } = await context.params
     
     const body = await request.json()
     const { title, content, author, tags, published } = body
     
     const blog = await Blog.findOneAndUpdate(
-      { slug: params.slug },
+      { slug },
       { title, content, author, tags, published },
       { new: true, runValidators: true }
     )
@@ -61,12 +63,13 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  context: { params: Promise<{ slug: string }> }
 ) {
   try {
     await dbConnect()
+    const { slug } = await context.params
     
-    const blog = await Blog.findOneAndDelete({ slug: params.slug })
+    const blog = await Blog.findOneAndDelete({ slug })
     
     if (!blog) {
       return NextResponse.json(
