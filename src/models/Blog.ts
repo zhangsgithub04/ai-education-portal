@@ -5,6 +5,7 @@ export interface IBlog {
   title: string
   content: string
   author: string
+  authorId: string
   tags: string[]
   createdAt: Date
   updatedAt: Date
@@ -26,6 +27,11 @@ const BlogSchema = new mongoose.Schema<IBlog>({
     type: String,
     required: [true, 'Please provide an author name'],
     maxlength: [100, 'Author name cannot be more than 100 characters']
+  },
+  authorId: {
+    type: String,
+    required: [true, 'Author ID is required'],
+    ref: 'User'
   },
   tags: {
     type: [String],

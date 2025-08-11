@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import dbConnect from '@/lib/mongodb'
 import Blog from '@/models/Blog'
+import { getAuthenticatedUserServer } from '@/lib/auth-server'
 
 export async function GET() {
   try {
@@ -21,14 +22,23 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    // Check authentication
+    const user = await getAuthenticatedUserServer()
+    if (!user) {
+      return NextResponse.json(
+        { success: false, error: 'Authentication required. Please sign in to create blog posts.' },
+        { status: 401 }
+      )
+    }
+    
     await dbConnect()
     
     const body = await request.json()
-    const { title, content, author, tags = [] } = body
+    const { title, content, tags = [] } = body
     
-    if (!title || !content || !author) {
+    if (!title || !content) {
       return NextResponse.json(
-        { success: false, error: 'Title, content, and author are required' },
+        { success: false, error: 'Title and content are required' },
         { status: 400 }
       )
     }
@@ -48,7 +58,8 @@ export async function POST(request: NextRequest) {
       const blog = await Blog.create({
         title,
         content,
-        author,
+        author: user.name,
+        authorId: user.id,
         tags,
         slug: newSlug,
         published: true
@@ -60,7 +71,8 @@ export async function POST(request: NextRequest) {
     const blog = await Blog.create({
       title,
       content,
-      author,
+      author: user.name,
+      authorId: user.id,
       tags,
       slug,
       published: true

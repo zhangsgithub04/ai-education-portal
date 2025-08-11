@@ -1,7 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { useSession } from "next-auth/react"
 import { Navigation } from "@/components/navigation"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -14,12 +15,20 @@ const MDEditor = dynamic(
 
 export default function NewBlog() {
   const router = useRouter()
+  const { data: session, status } = useSession()
   const [title, setTitle] = useState("")
   const [content, setContent] = useState("")
-  const [author, setAuthor] = useState("")
   const [tags, setTags] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+
+  useEffect(() => {
+    if (status === "loading") return // Still loading
+    if (!session) {
+      router.push("/auth/signin?callbackUrl=/blog/new")
+      return
+    }
+  }, [session, status, router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -35,7 +44,6 @@ export default function NewBlog() {
         body: JSON.stringify({
           title,
           content,
-          author,
           tags: tags.split(",").map(tag => tag.trim()).filter(Boolean),
         }),
       })
@@ -45,6 +53,7 @@ export default function NewBlog() {
       if (data.success) {
         router.push(`/blog/${data.data.slug}`)
       } else {
+        console.error('Blog creation error:', data)
         setError(data.error || "Failed to create blog post")
       }
     } catch (err) {
@@ -52,6 +61,24 @@ export default function NewBlog() {
     } finally {
       setLoading(false)
     }
+  }
+
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navigation />
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading...</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (!session) {
+    return null // Will redirect to sign in
   }
 
   return (
@@ -94,18 +121,12 @@ export default function NewBlog() {
               </div>
 
               <div>
-                <label htmlFor="author" className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Author
                 </label>
-                <input
-                  type="text"
-                  id="author"
-                  value={author}
-                  onChange={(e) => setAuthor(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Your name"
-                  required
-                />
+                <div className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md text-gray-600">
+                  {session.user?.name}
+                </div>
               </div>
 
               <div>
