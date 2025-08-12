@@ -1,6 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useSession } from "next-auth/react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Navigation } from "@/components/navigation"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
@@ -9,9 +11,12 @@ import { Badge } from "@/components/ui/badge"
 import { IBlog } from "@/models/Blog"
 
 export default function Blog() {
+  const { data: session } = useSession()
+  const router = useRouter()
   const [blogs, setBlogs] = useState<IBlog[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
+  const [deletingBlog, setDeletingBlog] = useState<string | null>(null)
 
   useEffect(() => {
     fetchBlogs()
@@ -47,6 +52,32 @@ export default function Blog() {
     const plainText = content.replace(/[#*`_~\[\]()]/g, "")
     if (plainText.length <= maxLength) return plainText
     return plainText.substring(0, maxLength) + "..."
+  }
+
+  const handleDelete = async (blog: IBlog) => {
+    if (!confirm("Are you sure you want to delete this blog post? This action cannot be undone.")) {
+      return
+    }
+
+    setDeletingBlog(blog._id || blog.slug)
+    try {
+      const response = await fetch(`/api/blogs/${blog.slug}`, {
+        method: "DELETE"
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        // Remove the deleted blog from the list
+        setBlogs(prevBlogs => prevBlogs.filter(b => b.slug !== blog.slug))
+      } else {
+        setError(data.error || "Failed to delete blog post")
+      }
+    } catch (err) {
+      setError("An error occurred while deleting the blog post")
+    } finally {
+      setDeletingBlog(null)
+    }
   }
 
   if (loading) {
@@ -103,54 +134,81 @@ export default function Blog() {
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {blogs.map((blog) => (
-            <Card key={blog._id} className="hover:shadow-lg transition-shadow">
-              <CardHeader className="pb-4">
-                <div className="space-y-2">
-                  <Link href={`/blog/${blog.slug}`}>
-                    <h3 className="text-xl font-semibold text-gray-900 hover:text-blue-600 transition-colors cursor-pointer">
-                      {blog.title}
-                    </h3>
-                  </Link>
-                  <div className="flex items-center text-sm text-gray-500 space-x-4">
-                    <span>By {blog.author}</span>
-                    <span>•</span>
-                    <span>{formatDate(blog.createdAt.toString())}</span>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <p className="text-gray-600 leading-relaxed">
-                    {truncateContent(blog.content)}
-                  </p>
-                  
-                  {blog.tags && blog.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-2">
-                      {blog.tags.slice(0, 3).map((tag, index) => (
-                        <Badge key={index} variant="secondary" className="text-xs">
-                          {tag}
-                        </Badge>
-                      ))}
-                      {blog.tags.length > 3 && (
-                        <Badge variant="outline" className="text-xs">
-                          +{blog.tags.length - 3} more
-                        </Badge>
+          {blogs.map((blog) => {
+            const isOwner = session?.user?.id === blog.authorId
+            const isDeleting = deletingBlog === (blog._id || blog.slug)
+            
+            return (
+              <Card key={blog._id} className="hover:shadow-lg transition-shadow">
+                <CardHeader className="pb-4">
+                  <div className="space-y-2">
+                    <div className="flex items-start justify-between">
+                      <Link href={`/blog/${blog.slug}`} className="flex-1">
+                        <h3 className="text-xl font-semibold text-gray-900 hover:text-blue-600 transition-colors cursor-pointer pr-2">
+                          {blog.title}
+                        </h3>
+                      </Link>
+                      
+                      {isOwner && (
+                        <div className="flex space-x-1 flex-shrink-0">
+                          <Link href={`/blog/${blog.slug}/edit`}>
+                            <Button variant="outline" size="sm" className="px-2 py-1 text-xs">
+                              Edit
+                            </Button>
+                          </Link>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDelete(blog)}
+                            disabled={isDeleting}
+                            className="px-2 py-1 text-xs text-red-600 hover:text-red-700 border-red-300 hover:border-red-400"
+                          >
+                            {isDeleting ? "..." : "Del"}
+                          </Button>
+                        </div>
                       )}
                     </div>
-                  )}
-                  
-                  <div className="pt-2">
-                    <Link href={`/blog/${blog.slug}`}>
-                      <Button variant="outline" size="sm" className="w-full">
-                        Read More
-                      </Button>
-                    </Link>
+                    
+                    <div className="flex items-center text-sm text-gray-500 space-x-4">
+                      <span>By {blog.author}</span>
+                      <span>•</span>
+                      <span>{formatDate(blog.createdAt.toString())}</span>
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <p className="text-gray-600 leading-relaxed">
+                      {truncateContent(blog.content)}
+                    </p>
+                    
+                    {blog.tags && blog.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        {blog.tags.slice(0, 3).map((tag, index) => (
+                          <Badge key={index} variant="secondary" className="text-xs">
+                            {tag}
+                          </Badge>
+                        ))}
+                        {blog.tags.length > 3 && (
+                          <Badge variant="outline" className="text-xs">
+                            +{blog.tags.length - 3} more
+                          </Badge>
+                        )}
+                      </div>
+                    )}
+                    
+                    <div className="pt-2">
+                      <Link href={`/blog/${blog.slug}`}>
+                        <Button variant="outline" size="sm" className="w-full">
+                          Read More
+                        </Button>
+                      </Link>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )
+          })}
         </div>
       </div>
     </div>

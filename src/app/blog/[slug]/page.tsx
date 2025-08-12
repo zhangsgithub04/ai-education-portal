@@ -1,7 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
+import { useSession } from "next-auth/react"
 import Link from "next/link"
 import { Navigation } from "@/components/navigation"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
@@ -14,11 +15,14 @@ import rehypeHighlight from "rehype-highlight"
 import "highlight.js/styles/github.css"
 
 export default function BlogPost() {
+  const { data: session } = useSession()
+  const router = useRouter()
   const params = useParams()
   const slug = params.slug as string
   const [blog, setBlog] = useState<IBlog | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     if (slug) {
@@ -52,6 +56,33 @@ export default function BlogPost() {
       minute: "2-digit",
     })
   }
+
+  const handleDelete = async () => {
+    if (!blog || !confirm("Are you sure you want to delete this blog post? This action cannot be undone.")) {
+      return
+    }
+
+    setDeleting(true)
+    try {
+      const response = await fetch(`/api/blogs/${blog.slug}`, {
+        method: "DELETE"
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        router.push("/blog")
+      } else {
+        setError(data.error || "Failed to delete blog post")
+      }
+    } catch (err) {
+      setError("An error occurred while deleting the blog post")
+    } finally {
+      setDeleting(false)
+    }
+  }
+
+  const isOwner = session?.user?.id === blog?.authorId
 
   if (loading) {
     return (
@@ -104,15 +135,44 @@ export default function BlogPost() {
         <Card>
           <CardHeader className="pb-6">
             <div className="space-y-4">
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 leading-tight">
-                {blog.title}
-              </h1>
+              <div className="flex items-start justify-between">
+                <h1 className="text-3xl md:text-4xl font-bold text-gray-900 leading-tight flex-1 mr-4">
+                  {blog.title}
+                </h1>
+                
+                {isOwner && (
+                  <div className="flex space-x-2 flex-shrink-0">
+                    <Link href={`/blog/${blog.slug}/edit`}>
+                      <Button variant="outline" size="sm">
+                        Edit
+                      </Button>
+                    </Link>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleDelete}
+                      disabled={deleting}
+                      className="text-red-600 hover:text-red-700 border-red-300 hover:border-red-400"
+                    >
+                      {deleting ? "Deleting..." : "Delete"}
+                    </Button>
+                  </div>
+                )}
+              </div>
               
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div className="flex items-center text-gray-600 space-x-4">
                   <span className="font-medium">By {blog.author}</span>
                   <span>•</span>
                   <span>{formatDate(blog.createdAt.toString())}</span>
+                  {blog.updatedAt !== blog.createdAt && (
+                    <>
+                      <span>•</span>
+                      <span className="text-sm text-gray-500">
+                        Updated {formatDate(blog.updatedAt.toString())}
+                      </span>
+                    </>
+                  )}
                 </div>
                 
                 {blog.tags && blog.tags.length > 0 && (
