@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import dbConnect from '@/lib/mongodb'
 import Blog from '@/models/Blog'
 import { getAuthenticatedUserServer } from '@/lib/auth-server'
+import { triggerContentAnalysis } from '@/lib/auto-analysis'
 
 export async function GET() {
   try {
@@ -65,6 +66,16 @@ export async function POST(request: NextRequest) {
         published: true
       })
       
+      // Trigger automatic content analysis
+      triggerContentAnalysis({
+        id: blog._id.toString(),
+        title: blog.title,
+        body: blog.content,
+        author: blog.author,
+        authorId: blog.authorId,
+        contentType: 'blog'
+      })
+      
       return NextResponse.json({ success: true, data: blog }, { status: 201 })
     }
     
@@ -76,6 +87,16 @@ export async function POST(request: NextRequest) {
       tags,
       slug,
       published: true
+    })
+    
+    // Trigger automatic content analysis
+    triggerContentAnalysis({
+      id: blog._id.toString(),
+      title: blog.title,
+      body: blog.content,
+      author: blog.author,
+      authorId: blog.authorId,
+      contentType: 'blog'
     })
     
     return NextResponse.json({ success: true, data: blog }, { status: 201 })

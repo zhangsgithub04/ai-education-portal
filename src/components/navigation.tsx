@@ -29,6 +29,9 @@ export function Navigation() {
             <Link href="/resources" className="text-gray-700 hover:text-blue-600 font-medium">Resources</Link>
             <Link href="/blog" className="text-gray-700 hover:text-blue-600 font-medium">Blog</Link>
             <Link href="/portfolio" className="text-gray-700 hover:text-blue-600 font-medium">Portfolio</Link>
+            {session && (
+              <Link href="/analytics" className="text-gray-700 hover:text-blue-600 font-medium">Analytics</Link>
+            )}
           </div>
 
           <div className="flex items-center space-x-4">
